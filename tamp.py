@@ -2,6 +2,8 @@
 from bs4 import BeautifulSoup
 import requests
 import os
+import csv
+
 
 URL = "https://yandex.ru/images/"
 HEADERS = {
@@ -50,12 +52,27 @@ def download_img(path, key):
 
 
 
+def create_annotation_file(dataset_path, output_file):
+    with open(output_file, 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow([f"      Absolute Path                 Relative Path      Class"])
+
+        for root, dirs, files in os.walk(dataset_path):
+            for file in files:
+                class_name = root.split(os.path.sep)[-1]
+                absolute_path = os.path.join(root, file)
+                relative_path = os.path.relpath(absolute_path, dataset_path)
+                csv_row = [f"{absolute_path}    {relative_path}    {class_name}"]
+                csv_writer.writerow(csv_row)
+
 
 
 def main():
     directory = os.getcwd()
-    download_img(directory, 'brown bear')
-    download_img(directory, 'polar bear')
+    #download_img(directory, 'brown bear')
+    #download_img(directory, 'polar bear')
+    create_annotation_file('dataset', 'annotation.csv')
+
 
 if __name__ == "__main__":
     main()
