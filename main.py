@@ -57,14 +57,18 @@ def create_annotation_file(dataset_path, output_file):
     with open(output_file, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow([f"      Absolute Path                 Relative Path      Class"])
-
         for root, dirs, files in os.walk(dataset_path):
             for file in files:
-                class_name = root.split(os.path.sep)[-1]
+                file_parts = file.split('_')
+                if len(file_parts) == 2: 
+                    class_name, file_number = file_parts
+                else:
+                    class_name = root.split(os.path.sep)[-1]
                 absolute_path = os.path.join(root, file)
                 relative_path = os.path.relpath(absolute_path, dataset_path)
                 csv_row = [f"{absolute_path}    {relative_path}    {class_name}"]
                 csv_writer.writerow(csv_row)
+
 
 
 
@@ -91,7 +95,7 @@ def main():
     #download_img(directory, 'polar bear')
     create_annotation_file('dataset', 'annotation.csv')
     copy_dataset_with_modified_filenames('dataset')
-
+    create_annotation_file('modified_dataset', 'modified_annotation.csv')
 
 if __name__ == "__main__":
     main()
