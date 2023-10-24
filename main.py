@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 import requests
 import os
 import csv
+import random
+import string
 
 
 URL = "https://yandex.ru/images/"
@@ -86,16 +88,29 @@ def copy_dataset_with_modified_filenames(dataset_path):
             shutil.copy(source_file, destination_file)
 
 
+def copy_dataset_with_random_filenames(dataset_path):
+    output_path = 'random_dataset'
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
 
+    for root, dirs, files in os.walk(dataset_path):
+        for file in files:
+            random_number = random.randint(0, 10000)
+            new_filename = f"{random_number}.jpg"
+            source_file = os.path.join(root, file)
+            destination_file = os.path.join(output_path, new_filename)
+            shutil.copy(source_file, destination_file)
 
 
 def main():
     directory = os.getcwd()
     #download_img(directory, 'brown bear')
     #download_img(directory, 'polar bear')
-    create_annotation_file('dataset', 'annotation.csv')
-    copy_dataset_with_modified_filenames('dataset')
-    create_annotation_file('modified_dataset', 'modified_annotation.csv')
+    #create_annotation_file('dataset', 'annotation.csv')
+    #copy_dataset_with_modified_filenames('dataset')
+    #create_annotation_file('modified_dataset', 'modified_annotation.csv')
+    copy_dataset_with_random_filenames('dataset')
+
 
 if __name__ == "__main__":
     main()
