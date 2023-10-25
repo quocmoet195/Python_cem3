@@ -93,9 +93,14 @@ def copy_dataset_with_random_filenames(dataset_path):
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
+    used_numbers=set()
     for root, dirs, files in os.walk(dataset_path):
         for file in files:
-            random_number = random.randint(0, 10000)
+            while True:
+                random_number = random.randint(0, 10000)
+                if random_number not in used_numbers:
+                    used_numbers.add(random_number)
+                    break
             new_filename = f"{random_number}.jpg"
             source_file = os.path.join(root, file)
             destination_file = os.path.join(output_path, new_filename)
@@ -106,10 +111,12 @@ def main():
     directory = os.getcwd()
     #download_img(directory, 'brown bear')
     #download_img(directory, 'polar bear')
-    #create_annotation_file('dataset', 'annotation.csv')
+    source_path=os.path.join(directory,'dataset')
+    create_annotation_file(source_path, 'annotation.csv')
     #copy_dataset_with_modified_filenames('dataset')
-    #create_annotation_file('modified_dataset', 'modified_annotation.csv')
-    copy_dataset_with_random_filenames('dataset')
+    source_path=os.path.join(directory,'modified_dataset')
+    create_annotation_file('D:\PYTHON_cem3\modified_dataset', 'modified_annotation.csv')
+    #copy_dataset_with_random_filenames('dataset')
 
 
 if __name__ == "__main__":
