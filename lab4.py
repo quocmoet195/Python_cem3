@@ -1,6 +1,9 @@
 import os
 import pandas as pd
 from PIL import Image
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def create_dataframe(dataset_path):
@@ -45,6 +48,40 @@ def group_by_class(df):
     grouped_stats = df.groupby('Class')['Pixel Count'].agg(['min', 'max', 'mean'])
     return grouped_stats
 
+def plot_histogram(image, class_label, save_path=None):
+        # Считаем изображение с использованием OpenCV
+    img = cv2.imread(image)
+
+    # Разделим изображение на каналы B, G, R
+    b, g, r = cv2.split(img)
+
+    # Вычислим гистограммы для каждого канала
+    hist_b = cv2.calcHist([b], [0], None, [256], [0, 256])
+    hist_g = cv2.calcHist([g], [0], None, [256], [0, 256])
+    hist_r = cv2.calcHist([r], [0], None, [256], [0, 256])
+
+    # Отрисовываем гистограммы
+    plt.figure(figsize=(10, 6))
+    plt.title(f'Histogram for Class: {class_label}')
+    plt.subplot(3, 1, 1)
+    plt.plot(hist_b, color='blue')
+    plt.title('Blue Channel Histogram')
+    plt.subplot(3, 1, 2)
+    plt.plot(hist_g, color='green')
+    plt.title('Green Channel Histogram')
+    plt.subplot(3, 1, 3)
+    plt.plot(hist_r, color='red')
+    plt.title('Red Channel Histogram')
+
+    #plt.tight_layout()
+    #plt.show()
+    plt.tight_layout()
+    if save_path:
+        plt.savefig(save_path)
+    else:
+        # Если путь не указан, отображаем изображение в интерфейсе
+        plt.show()
+
 def main():
     directory = os.getcwd()
     source_path = os.path.join(directory, 'dataset')
@@ -52,10 +89,19 @@ def main():
     df = add_label_column(df)
     df = add_image_size_columns(df)
 
+    # Выбираем случайное изображение
+    random_image_row = df.sample(1).iloc[0]
+    random_image_path = random_image_row['Absolute Path']
+    random_image_class = random_image_row['Class']
+
+    save_path = 'histogram_image.png'
+    plot_histogram(random_image_path, random_image_class, save_path)
+
+    # Строим и отрисовываем гистограмму
+    save_path_plot = 'output_plot.png'
     df.to_csv('output_dataframe.csv', index=False)
-
-    
-
+    plt.savefig(save_path_plot)
 
 if __name__ == "__main__":
     main()
+    
